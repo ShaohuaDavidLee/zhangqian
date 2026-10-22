@@ -1,0 +1,15 @@
+{
+  "name": "zhangqian",
+  "account_id": "23a46165f236ba895ba94c8ee3585768",
+  "compatibility_date": "2026-10-22",
+  "assets": {
+    "directory": "./site",
+    "html_handling": "auto-trailing-slash"
+  },
+  "routes": [
+    {
+      "pattern": "zhangqian.caojuege.com",
+      "custom_domain": true
+    }
+  ]
+}

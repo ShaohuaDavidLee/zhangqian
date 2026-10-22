@@ -1,0 +1,250 @@
+/* 彩色水墨亭 — 立轴式版面的处理样式。
+ * 每一笔颜色、每一个尺寸都读 token；字号、字重、行高来自 tokens 里的文字样式类
+ * （.heading-1、.body、.caption…），这里只写「处理」。 */
+
+body {
+  margin: 0;
+  background: var(--card);
+  color: var(--body);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 页：一张 1280×720 的纸。缩放时缩整张画布，不改里面的数。 ── */
+.sm-slide {
+  position: relative;
+  box-sizing: border-box;
+  width: 1280px;
+  height: 720px;
+  padding: var(--card-padding);
+  background: var(--card);
+  color: var(--body);
+  font-family: var(--font-serif);
+  overflow: hidden;
+}
+.sm-slide h1, .sm-slide h2, .sm-slide h3, .sm-slide h4, .sm-slide p,
+.sm-block h1, .sm-block h2, .sm-block h3, .sm-block h4, .sm-block p { margin: 0; }
+.sm-slide p, .sm-block p { line-break: strict; }
+
+/* 不带界框的局部：只取纸色与内边距。 */
+.sm-block {
+  box-sizing: border-box;
+  padding: var(--card-padding);
+  background: var(--card);
+  color: var(--body);
+  font-family: var(--font-serif);
+}
+
+/* ── 一 · 双线界框：外线是 neutral-border 的发丝线，四角切成小台阶；内线是压淡的 ink。 ── */
+.sm-frame::before,
+.sm-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+/* 外线：在内线之外 frame-gap 处，四角各切掉一个 frame-notch 见方的角，再用八段小台阶补上缺口。 */
+.sm-frame::before {
+  --l: linear-gradient(var(--neutral-border), var(--neutral-border));
+  --step: calc(var(--frame-notch) + var(--hairline));
+  inset: calc(var(--frame-inset) - var(--frame-gap));
+  border: var(--hairline) solid var(--neutral-border);
+  clip-path: polygon(
+    var(--frame-notch) 0, calc(100% - var(--frame-notch)) 0, calc(100% - var(--frame-notch)) var(--frame-notch),
+    100% var(--frame-notch), 100% calc(100% - var(--frame-notch)), calc(100% - var(--frame-notch)) calc(100% - var(--frame-notch)),
+    calc(100% - var(--frame-notch)) 100%, var(--frame-notch) 100%, var(--frame-notch) calc(100% - var(--frame-notch)),
+    0 calc(100% - var(--frame-notch)), 0 var(--frame-notch), var(--frame-notch) var(--frame-notch)
+  );
+  background:
+    var(--l) left 0 top var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) left var(--frame-notch) top 0 / var(--hairline) var(--step) no-repeat border-box,
+    var(--l) right 0 top var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) right var(--frame-notch) top 0 / var(--hairline) var(--step) no-repeat border-box,
+    var(--l) left 0 bottom var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) left var(--frame-notch) bottom 0 / var(--hairline) var(--step) no-repeat border-box,
+    var(--l) right 0 bottom var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) right var(--frame-notch) bottom 0 / var(--hairline) var(--step) no-repeat border-box;
+}
+/* 内线：离页边 frame-inset 的一圈完整的线。 */
+.sm-frame::after {
+  inset: var(--frame-inset);
+  border: var(--hairline) solid var(--ink);
+  opacity: var(--frame-inner-opacity);
+}
+
+/* ── 二 · 朱印：一枚小方印，seal 色只在这里出现。 ── */
+.sm-seal {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  padding-inline: var(--seal-pad-inline);
+  padding-block: var(--seal-pad-block);
+  border-radius: var(--radius-seal);
+  background: var(--seal);
+  color: var(--on-seal);
+  white-space: nowrap;
+}
+/* 朱印＋横排标题：印在上，题在下，贴在一起读作一个单元。 */
+.sm-title { display: flex; flex-direction: column; align-items: flex-start; gap: var(--hug-gap); }
+
+/* 时间轴的轨：一条发丝线穿过每一步的印。 */
+.sm-seal-track {
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(var(--neutral-border), var(--neutral-border)) center / 100% var(--hairline) no-repeat;
+}
+.sm-timeline { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.sm-timeline__step { display: flex; flex-direction: column; align-items: stretch; gap: var(--cell-block-gap); text-align: center; }
+
+/* ── 三 · 竖排题：宋体竖排，汉字直立。 ── */
+.sm-tate {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.1em;
+  line-height: 1.08;
+}
+/* 竖排大题要留出放大那个字的行宽。 */
+.sm-tate.display-xl, .sm-tate.display-lg, .sm-tate.display-md { line-height: 1.3; }
+/* 单列竖排，从格子的左缘挂下来（列首压在左对齐的释文上方）。 */
+.sm-tate-start { writing-mode: vertical-lr; }
+
+/* 疏排的英文眉题：全大写，字重 300。 */
+.sm-latin {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 300;
+  color: var(--body-muted);
+}
+
+/* ── 四 · 挂轴签：窄框、内线，顶上一根绳一个环。 ── */
+.sm-tab {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cell-block-gap);
+  min-width: var(--tab-min-width);
+  padding: var(--tab-pad-block) var(--tab-pad-inline);
+  border: var(--hairline) solid var(--neutral-border);
+  border-radius: var(--radius-none);
+  box-shadow: var(--tab-keyline);
+}
+.sm-tab::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - var(--hairline) / 2);
+  top: calc(-1 * var(--tab-cord));
+  width: var(--hairline);
+  height: var(--tab-cord);
+  background: var(--neutral-border);
+}
+.sm-tab::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - var(--tab-ring) / 2);
+  top: calc(-1 * (var(--tab-cord) + var(--tab-ring)));
+  width: var(--tab-ring);
+  height: var(--tab-ring);
+  border: var(--hairline) solid var(--neutral-border);
+  border-radius: var(--radius-round);
+  box-sizing: border-box;
+}
+.sm-tab .sm-tate { width: fit-content; margin-inline: auto; }
+.sm-tab__rule {
+  flex: none;
+  width: 33%;
+  height: var(--divider-thickness);
+  margin: 0;
+  border: 0;
+  border-radius: calc(var(--divider-thickness) / 2);
+  background: var(--neutral-border);
+}
+
+/* ── 五 · 铜月：一个 bronze 色的圆。 ── */
+.sm-moon {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--radius-round);
+  background: var(--bronze);
+}
+
+/* ── 六 · 条幅：画心裱成立轴——一圈窄衬纸，一条发丝边线。 ── */
+.sm-plate { margin: 0; display: flex; flex-direction: column; gap: var(--cell-block-gap); }
+.sm-plate__img {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  border: var(--hairline) solid var(--neutral-border);
+  padding: var(--plate-mat);
+  background-color: var(--card);
+  object-fit: cover;
+}
+/* 还没有画的画心：衬纸之内铺 mist。 */
+.sm-plate__img--empty {
+  background: linear-gradient(var(--mist), var(--mist)) content-box, var(--card);
+}
+.sm-plate figcaption { text-align: center; color: var(--body-muted); }
+
+/* ── 七 · 大写数目与数据大字的字形处理都在文字样式里（.numeral、.metric）。 ── */
+.sm-metric { display: flex; flex-direction: column; align-items: center; gap: var(--hug-gap); text-align: center; }
+.sm-metric .caption { color: var(--body-muted); }
+
+/* ── 台账：表格、数据接缝、并列栏之间的发丝线。 ── */
+.sm-ledger { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.sm-ledger > * { padding-inline: calc(var(--grid-gap-lg) / 2); }
+.sm-ledger > * + * { border-left: var(--hairline) solid var(--neutral-border); }
+.sm-ledger > :first-child { padding-inline-start: 0; }
+.sm-ledger > :last-child { padding-inline-end: 0; }
+
+.sm-table { width: 100%; border-collapse: collapse; }
+.sm-table th, .sm-table td {
+  padding: var(--table-pad-block) var(--table-pad-inline);
+  border-bottom: var(--hairline) solid var(--neutral-border);
+  text-align: left;
+  vertical-align: baseline;
+  font-weight: inherit;
+}
+.sm-table tr:last-child td { border-bottom: 0; }
+.sm-table th.caption { color: var(--body-muted); }
+/* 要突出的那一列（通常是最新的一期）换成 accent。 */
+.sm-table .sm-accent, .sm-accent { color: var(--accent); }
+
+/* 条目清单：一行一个条目，条目之间一条横向发丝线。 */
+.sm-list { display: flex; flex-direction: column; }
+.sm-list > * { display: flex; flex-direction: column; gap: var(--cell-block-gap); padding-block: var(--cell-padding); }
+.sm-list > * + * { border-top: var(--hairline) solid var(--neutral-border); }
+.sm-list > :first-child { padding-block-start: 0; }
+.sm-list > :last-child { padding-block-end: 0; }
+
+/* ── 八 · 云纹：一朵淡淡的线描祥云，不压字。大画四边晕开，不加框。 ── */
+.sm-cloud { display: block; object-fit: contain; opacity: var(--cloud-opacity); }
+.sm-vignette { display: block; object-fit: cover; }
+
+/* ── 位置图：线描的平面示意，水面铺 mist，位置用 bronze 的小环标出。 ── */
+.sm-map { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font-serif); }
+.sm-map__water { fill: var(--mist); fill-opacity: 0.7; stroke: var(--neutral-border); stroke-width: 1; }
+.sm-map__isle { fill: color-mix(in srgb, var(--neutral-border) 22%, var(--card)); stroke: var(--neutral-border); stroke-width: 0.75; }
+.sm-map__line { fill: none; stroke: var(--neutral-border); stroke-width: 1; }
+.sm-map__shore { fill: var(--body-muted); font-size: 11px; letter-spacing: 0.2em; }
+.sm-map__ring { fill: var(--card); stroke: var(--bronze); stroke-width: 2; }
+.sm-map__site--on .sm-map__ring { fill: var(--bronze); }
+.sm-map__name { fill: var(--body); font-size: 13px; letter-spacing: 0.08em; }
+.sm-map__site:focus-visible { outline: none; }
+.sm-map__site:focus-visible .sm-map__focus { stroke: var(--accent); stroke-width: 1.25; stroke-dasharray: 2 2; }
+.sm-map__focus { fill: none; stroke: none; }
+
+/* ── 版面的两个小规矩 ── */
+.sm-measure { max-width: var(--measure); }
+.sm-gap { margin-block-start: var(--section-gap); }
+.sm-muted { color: var(--body-muted); }
+.sm-marker { color: var(--accent); }
+
+/* ── 图表：柱用 stone，高亮的柱用 bronze；线与面积用 accent。 ── */
+.sm-chart { display: block; width: 100%; height: auto; overflow: visible; }
+.sm-chart__bar { fill: var(--stone); }
+.sm-chart__bar--hi { fill: var(--bronze); }
+.sm-chart__line { fill: none; stroke: var(--accent); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.sm-chart__area-stop { stop-color: var(--accent); }
+.sm-chart__area { opacity: var(--area-fill-opacity); }
+.sm-chart__grid { stroke: var(--line); stroke-width: var(--hairline); }
+.sm-chart__label { fill: var(--body-muted); }

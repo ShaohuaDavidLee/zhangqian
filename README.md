@@ -64,3 +64,23 @@ zhangqian/
 
 - [SKILL.md](./SKILL.md)：技能完整指令。
 - [zhangqian.skill](./zhangqian.skill)：安装包，包含 `zhangqian/SKILL.md`。
+
+## 落地页与部署
+
+线上地址：[zhangqian.caojuege.com](https://zhangqian.caojuege.com/)。
+
+`site/` 是可直接部署的静态页面，保留水墨版式与完整文案。Hero 使用敦煌西行插画，四周以 CSS 透明蒙版融入纸色；结尾使用大夏市集插画。页面不依赖 React 或设计工具的预览运行时。
+
+本地预览：
+
+```sh
+python3 -m http.server 8766 --directory site
+```
+
+部署到 Cloudflare Workers Static Assets（先在本机登录 Cloudflare）：
+
+```sh
+npx wrangler@4.151.3 deploy
+```
+
+`wrangler.jsonc` 配置了静态目录及 `zhangqian.caojuege.com` 自定义域名。
