@@ -1,0 +1,17 @@
+# Generated image names include a content hash, so browser caches stay safe.
+/assets/hero-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/boat-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/cloud-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/reeds-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/ornament-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/journey-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/envoy-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/market-*
+  Cache-Control: public, max-age=31536000, immutable
