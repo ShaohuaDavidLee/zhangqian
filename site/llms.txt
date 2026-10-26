@@ -1,0 +1,12 @@
+# 张骞
+
+> 公开页面与技能的读取入口。技能在使用者自己的 agent 环境运行；本站不提供在线 MCP 服务。
+
+## 站点说明
+
+- [张骞.skill：让市场告诉你，谁愿意为你付钱](https://zhangqian.caojuege.com/index.md)
+
+## Skills
+
+- [机器可读索引](https://zhangqian.caojuege.com/.well-known/agent-skills/index.json)
+- [zhangqian](https://zhangqian.caojuege.com/downloads/agent-zhangqian-1a5788fdcb6c5947.zip)：当产品已经上线，需要寻找首批海外付费用户、做出海冷启动、验证用户群，或已有使用却不清楚谁愿意付钱时使用。也适用于用户明确要求用张骞评估已上线产品。不用于上线前的新产品需求裁决。
