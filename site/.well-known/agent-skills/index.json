@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "zhangqian",
+      "description": "当产品已经上线，需要寻找首批海外付费用户、做出海冷启动、验证用户群，或已有使用却不清楚谁愿意付钱时使用。也适用于用户明确要求用张骞评估已上线产品。不用于上线前的新产品需求裁决。",
+      "type": "archive",
+      "url": "https://zhangqian.caojuege.com/downloads/agent-zhangqian-1a5788fdcb6c5947.zip",
+      "digest": "sha256:1a5788fdcb6c5947a74aa75217deed27c55013dc0203fcf2f812e6ec952c1b48"
+    }
+  ]
+}
