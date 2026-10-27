@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>张骞.skill：让市场告诉你，谁愿意为你付钱</title>
+<meta name="description" content="为已上线却还不知道谁愿意付钱的产品，设计低成本小实验。张骞.skill 先给一页行动单，先跑一个主实验，备选与技术说明按需查阅。">
+<meta name="theme-color" content="#e8e4e1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='3' fill='%23bc3b3e'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' font-family='serif' fill='white'%3E张%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400;500&amp;display=swap" rel="stylesheet">
+<style>
+/* components.css */
+/* 彩色水墨亭 — 立轴式版面的处理样式。
+ * 每一笔颜色、每一个尺寸都读 token；字号、字重、行高来自 tokens 里的文字样式类
+ * （.heading-1、.body、.caption…），这里只写「处理」。 */
+
+body {
+  margin: 0;
+  background: var(--card);
+  color: var(--body);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 页：一张 1280×720 的纸。缩放时缩整张画布，不改里面的数。 ── */
+.sm-slide {
+  position: relative;
+  box-sizing: border-box;
+  width: 1280px;
+  height: 720px;
+  padding: var(--card-padding);
+  background: var(--card);
+  color: var(--body);
+  font-family: var(--font-serif);
+  overflow: hidden;
+}
+.sm-slide h1, .sm-slide h2, .sm-slide h3, .sm-slide h4, .sm-slide p,
+.sm-block h1, .sm-block h2, .sm-block h3, .sm-block h4, .sm-block p { margin: 0; }
+.sm-slide p, .sm-block p { line-break: strict; }
+
+/* 不带界框的局部：只取纸色与内边距。 */
+.sm-block {
+  box-sizing: border-box;
+  padding: var(--card-padding);
+  background: var(--card);
+  color: var(--body);
+  font-family: var(--font-serif);
+}
+
+/* ── 一 · 双线界框：外线是 neutral-border 的发丝线，四角切成小台阶；内线是压淡的 ink。 ── */
+.sm-frame::before,
+.sm-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+/* 外线：在内线之外 frame-gap 处，四角各切掉一个 frame-notch 见方的角，再用八段小台阶补上缺口。 */
+.sm-frame::before {
+  --l: linear-gradient(var(--neutral-border), var(--neutral-border));
+  --step: calc(var(--frame-notch) + var(--hairline));
+  inset: calc(var(--frame-inset) - var(--frame-gap));
+  border: var(--hairline) solid var(--neutral-border);
+  clip-path: polygon(
+    var(--frame-notch) 0, calc(100% - var(--frame-notch)) 0, calc(100% - var(--frame-notch)) var(--frame-notch),
+    100% var(--frame-notch), 100% calc(100% - var(--frame-notch)), calc(100% - var(--frame-notch)) calc(100% - var(--frame-notch)),
+    calc(100% - var(--frame-notch)) 100%, var(--frame-notch) 100%, var(--frame-notch) calc(100% - var(--frame-notch)),
+    0 calc(100% - var(--frame-notch)), 0 var(--frame-notch), var(--frame-notch) var(--frame-notch)
+  );
+  background:
+    var(--l) left 0 top var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) left var(--frame-notch) top 0 / var(--hairline) var(--step) no-repeat border-box,
+    var(--l) right 0 top var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) right var(--frame-notch) top 0 / var(--hairline) var(--step) no-repeat border-box,
+    var(--l) left 0 bottom var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) left var(--frame-notch) bottom 0 / var(--hairline) var(--step) no-repeat border-box,
+    var(--l) right 0 bottom var(--frame-notch) / var(--step) var(--hairline) no-repeat border-box,
+    var(--l) right var(--frame-notch) bottom 0 / var(--hairline) var(--step) no-repeat border-box;
+}
+/* 内线：离页边 frame-inset 的一圈完整的线。 */
+.sm-frame::after {
+  inset: var(--frame-inset);
+  border: var(--hairline) solid var(--ink);
+  opacity: var(--frame-inner-opacity);
+}
+
+/* ── 二 · 朱印：一枚小方印，seal 色只在这里出现。 ── */
+.sm-seal {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  padding-inline: var(--seal-pad-inline);
+  padding-block: var(--seal-pad-block);
+  border-radius: var(--radius-seal);
+  background: var(--seal);
+  color: var(--on-seal);
+  white-space: nowrap;
+}
+/* 朱印＋横排标题：印在上，题在下，贴在一起读作一个单元。 */
+.sm-title { display: flex; flex-direction: column; align-items: flex-start; gap: var(--hug-gap); }
+
+/* 时间轴的轨：一条发丝线穿过每一步的印。 */
+.sm-seal-track {
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(var(--neutral-border), var(--neutral-border)) center / 100% var(--hairline) no-repeat;
+}
+.sm-timeline { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.sm-timeline__step { display: flex; flex-direction: column; align-items: stretch; gap: var(--cell-block-gap); text-align: center; }
+
+/* ── 三 · 竖排题：宋体竖排，汉字直立。 ── */
+.sm-tate {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.1em;
+  line-height: 1.08;
+}
+/* 竖排大题要留出放大那个字的行宽。 */
+.sm-tate.display-xl, .sm-tate.display-lg, .sm-tate.display-md { line-height: 1.3; }
+/* 单列竖排，从格子的左缘挂下来（列首压在左对齐的释文上方）。 */
+.sm-tate-start { writing-mode: vertical-lr; }
+
+/* 疏排的英文眉题：全大写，字重 300。 */
+.sm-latin {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 300;
+  color: var(--body-muted);
+}
+
+/* ── 四 · 挂轴签：窄框、内线，顶上一根绳一个环。 ── */
+.sm-tab {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cell-block-gap);
+  min-width: var(--tab-min-width);
+  padding: var(--tab-pad-block) var(--tab-pad-inline);
+  border: var(--hairline) solid var(--neutral-border);
+  border-radius: var(--radius-none);
+  box-shadow: var(--tab-keyline);
+}
+.sm-tab::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - var(--hairline) / 2);
+  top: calc(-1 * var(--tab-cord));
+  width: var(--hairline);
+  height: var(--tab-cord);
+  background: var(--neutral-border);
+}
+.sm-tab::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - var(--tab-ring) / 2);
+  top: calc(-1 * (var(--tab-cord) + var(--tab-ring)));
+  width: var(--tab-ring);
+  height: var(--tab-ring);
+  border: var(--hairline) solid var(--neutral-border);
+  border-radius: var(--radius-round);
+  box-sizing: border-box;
+}
+.sm-tab .sm-tate { width: fit-content; margin-inline: auto; }
+.sm-tab__rule {
+  flex: none;
+  width: 33%;
+  height: var(--divider-thickness);
+  margin: 0;
+  border: 0;
+  border-radius: calc(var(--divider-thickness) / 2);
+  background: var(--neutral-border);
+}
+
+/* ── 五 · 铜月：一个 bronze 色的圆。 ── */
+.sm-moon {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--radius-round);
+  background: var(--bronze);
+}
+
+/* ── 六 · 条幅：画心裱成立轴——一圈窄衬纸，一条发丝边线。 ── */
+.sm-plate { margin: 0; display: flex; flex-direction: column; gap: var(--cell-block-gap); }
+.sm-plate__img {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  border: var(--hairline) solid var(--neutral-border);
+  padding: var(--plate-mat);
+  background-color: var(--card);
+  object-fit: cover;
+}
+/* 还没有画的画心：衬纸之内铺 mist。 */
+.sm-plate__img--empty {
+  background: linear-gradient(var(--mist), var(--mist)) content-box, var(--card);
+}
+.sm-plate figcaption { text-align: center; color: var(--body-muted); }
+
+/* ── 七 · 大写数目与数据大字的字形处理都在文字样式里（.numeral、.metric）。 ── */
+.sm-metric { display: flex; flex-direction: column; align-items: center; gap: var(--hug-gap); text-align: center; }
+.sm-metric .caption { color: var(--body-muted); }
+
+/* ── 台账：表格、数据接缝、并列栏之间的发丝线。 ── */
+.sm-ledger { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.sm-ledger > * { padding-inline: calc(var(--grid-gap-lg) / 2); }
+.sm-ledger > * + * { border-left: var(--hairline) solid var(--neutral-border); }
+.sm-ledger > :first-child { padding-inline-start: 0; }
+.sm-ledger > :last-child { padding-inline-end: 0; }
+
+.sm-table { width: 100%; border-collapse: collapse; }
+.sm-table th, .sm-table td {
+  padding: var(--table-pad-block) var(--table-pad-inline);
+  border-bottom: var(--hairline) solid var(--neutral-border);
+  text-align: left;
+  vertical-align: baseline;
+  font-weight: inherit;
+}
+.sm-table tr:last-child td { border-bottom: 0; }
+.sm-table th.caption { color: var(--body-muted); }
+/* 要突出的那一列（通常是最新的一期）换成 accent。 */
+.sm-table .sm-accent, .sm-accent { color: var(--accent); }
+
+/* 条目清单：一行一个条目，条目之间一条横向发丝线。 */
+.sm-list { display: flex; flex-direction: column; }
+.sm-list > * { display: flex; flex-direction: column; gap: var(--cell-block-gap); padding-block: var(--cell-padding); }
+.sm-list > * + * { border-top: var(--hairline) solid var(--neutral-border); }
+.sm-list > :first-child { padding-block-start: 0; }
+.sm-list > :last-child { padding-block-end: 0; }
+
+/* ── 八 · 云纹：一朵淡淡的线描祥云，不压字。大画四边晕开，不加框。 ── */
+.sm-cloud { display: block; object-fit: contain; opacity: var(--cloud-opacity); }
+.sm-vignette { display: block; object-fit: cover; }
+
+/* ── 位置图：线描的平面示意，水面铺 mist，位置用 bronze 的小环标出。 ── */
+.sm-map { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font-serif); }
+.sm-map__water { fill: var(--mist); fill-opacity: 0.7; stroke: var(--neutral-border); stroke-width: 1; }
+.sm-map__isle { fill: color-mix(in srgb, var(--neutral-border) 22%, var(--card)); stroke: var(--neutral-border); stroke-width: 0.75; }
+.sm-map__line { fill: none; stroke: var(--neutral-border); stroke-width: 1; }
+.sm-map__shore { fill: var(--body-muted); font-size: 11px; letter-spacing: 0.2em; }
+.sm-map__ring { fill: var(--card); stroke: var(--bronze); stroke-width: 2; }
+.sm-map__site--on .sm-map__ring { fill: var(--bronze); }
+.sm-map__name { fill: var(--body); font-size: 13px; letter-spacing: 0.08em; }
+.sm-map__site:focus-visible { outline: none; }
+.sm-map__site:focus-visible .sm-map__focus { stroke: var(--accent); stroke-width: 1.25; stroke-dasharray: 2 2; }
+.sm-map__focus { fill: none; stroke: none; }
+
+/* ── 版面的两个小规矩 ── */
+.sm-measure { max-width: var(--measure); }
+.sm-gap { margin-block-start: var(--section-gap); }
+.sm-muted { color: var(--body-muted); }
+.sm-marker { color: var(--accent); }
+
+/* ── 图表：柱用 stone，高亮的柱用 bronze；线与面积用 accent。 ── */
+.sm-chart { display: block; width: 100%; height: auto; overflow: visible; }
+.sm-chart__bar { fill: var(--stone); }
+.sm-chart__bar--hi { fill: var(--bronze); }
+.sm-chart__line { fill: none; stroke: var(--accent); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.sm-chart__area-stop { stop-color: var(--accent); }
+.sm-chart__area { opacity: var(--area-fill-opacity); }
+.sm-chart__grid { stroke: var(--line); stroke-width: var(--hairline); }
+.sm-chart__label { fill: var(--body-muted); }
+
+/* styles.css */
+:root{
+--accent:#6B5535;--bronze:#AE9368;--stone:#C3BFBB;--ink:#2B2622;--mist:#DCD7D2;--seal:#BC3B3E;--card:#E8E4E1;--surface:#EFECE9;--neutral-background:#DBD7D4;--accent-muted:#EEE7DD;--shape-background:#DFD4CC;--neutral-border:#B3ADA7;--line:#C5BAB2;--card-border:#E5E0DF;--body:#2B2622;--heading:#2B2622;--body-muted:#5E5650;--on-accent:#FFFFFF;--on-seal:#FFFFFF;--accent-dim:#513B1B;--accent-light:#846E4E;--bronze-readable:#856D47;--stone-readable:#6C6660;--mist-readable:#736659;--link:#6B5535;--link-hover:#8D7046;
+--font-serif:"Noto Serif SC","Songti SC",SimSun,serif;
+--hairline:1px;--divider-thickness:2px;--frame-inset:32px;--frame-gap:6px;--frame-notch:10.67px;--card-padding:96px;--cell-padding:24px;--grid-gap-sm:16px;--grid-gap-md:32px;--grid-gap-lg:48px;--hug-gap:9.67px;--list-gap:6px;--cell-block-gap:14px;--subheading-gap-below:17px;--block-gap:21.33px;--heading-gap-below:23.67px;--heading-gap-above:40.67px;--section-gap:42.67px;--seal-pad-inline:4px;--seal-pad-block:5.33px;--plate-mat:4px;--tab-pad-inline:8px;--tab-pad-block:21.33px;--tab-min-width:72px;--tab-cord:18.67px;--tab-ring:8px;--table-pad-block:0.4em;--table-pad-inline:0.75em;--measure:440px;
+--radius-none:0px;--radius-box:1px;--radius-seal:2px;--radius-button:7px;--radius-round:50%;
+--focus-ring:0 0 0 3px #6B5535;--tab-keyline:inset 0 0 0 4px #E8E4E1, inset 0 0 0 5px #B3ADA7;
+--frame-inner-opacity:0.4;--cloud-opacity:0.75;--shape-fill-opacity:0.5;--area-fill-opacity:0.15;
+}
+body{margin:0;background:#E8E4E1;color:#2B2622;font-family:"Noto Serif SC","Songti SC",SimSun,serif}
+a{color:#6B5535}a:hover{color:#8D7046}
+a:focus-visible{outline:none;box-shadow:0 0 0 3px #6B5535}
+.display-xl{font-size:117.33px;line-height:1;font-weight:200;letter-spacing:0.1em}
+.display-lg{font-size:77.33px;line-height:1;font-weight:200;letter-spacing:0.1em}
+.display-md{font-size:58.67px;line-height:1.25;font-weight:200;letter-spacing:0.1em}
+.heading-1{font-size:40px;line-height:1.25;font-weight:300;letter-spacing:0.06em}
+.heading-2{font-size:32px;line-height:1.25;font-weight:300;letter-spacing:0.06em}
+.heading-3{font-size:24px;line-height:1.25;font-weight:300;letter-spacing:0.06em}
+.heading-4{font-size:20px;line-height:1.25;font-weight:300;letter-spacing:0.06em}
+.subheading{font-size:22.67px;line-height:1.35;font-weight:400;letter-spacing:0.04em}
+.body-lg{font-size:21.33px;line-height:1.8;font-weight:400;letter-spacing:0.04em}
+.body{font-size:18.67px;line-height:1.8;font-weight:400;letter-spacing:0.04em}
+.body-sm{font-size:16px;line-height:1.8;font-weight:400;letter-spacing:0.04em}
+.caption{font-size:14.67px;line-height:1.6;font-weight:400;letter-spacing:0.04em}
+.eyebrow{font-size:14px;line-height:1.2;font-weight:300;letter-spacing:0.22em}
+.seal-label{font-size:13.33px;line-height:1.1;font-weight:500;letter-spacing:0.06em}
+p,h1,h2,h3,h4,figure,ul,ol,blockquote{margin:0}
+p{line-break:strict}
+
+.page{max-width:1280px;margin:0 auto;padding:0 24px 56px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+.topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px;padding:24px 8px 0}
+.brand{display:inline-flex;align-items:center;gap:14px;min-height:44px;color:#2B2622;text-decoration:none}
+.brand:hover{color:#2B2622}
+.nav{display:flex;flex-wrap:wrap;gap:0 24px;list-style:none;padding:0}
+.nav a{display:inline-flex;align-items:center;min-height:44px;color:#2B2622;text-decoration:none}
+.nav a:hover{color:#8D7046}
+.sheet{position:relative}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.sheet-num{display:flex;flex-direction:column;align-items:flex-end;gap:12px;text-align:right}
+.num{font-size:40px;font-weight:200;line-height:1;letter-spacing:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:48px;padding:0 24px;border-radius:7px;font-size:16px;letter-spacing:0.06em;text-decoration:none;white-space:nowrap}
+.btn-primary{background:#6B5535;color:#FFFFFF}
+.btn-primary:hover{background:#513B1B;color:#FFFFFF}
+.btn-ghost{border:1px solid #B3ADA7;color:#2B2622;background:transparent}
+.btn-ghost:hover{background:#EFECE9;color:#2B2622}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.plain{list-style:none;padding:0}
+
+.hero-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:48px;align-items:stretch}
+.hero-left{display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.hero-cluster{display:flex;align-items:flex-start;gap:28px}
+.hero-name{display:flex;flex-direction:column;align-items:center;gap:28px}
+.swell{font-size:138.67px}
+.hero-art{width:100%;max-width:640px;aspect-ratio:4/3;justify-self:end}
+.hero-cloud{width:157px;height:112px}
+.hero-band{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;margin-top:48px;padding-top:40px;border-top:1px solid #B3ADA7}
+.hero-copy{display:flex;flex-direction:column;gap:24px}
+
+.two-col{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:64px;margin-top:42.67px;align-items:start}
+.prose{display:flex;flex-direction:column;gap:21.33px}
+.statement{line-height:1.6}
+.stats{margin-top:56px;padding-top:40px;border-top:1px solid #B3ADA7}
+.stat{display:flex;flex-direction:column;gap:10px}
+.stat-figure{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.stat-num{font-size:64px;font-weight:200;line-height:1.05;letter-spacing:0.02em}
+.stat-unit{font-size:24px;font-weight:200;letter-spacing:0.04em}
+
+.kit{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:64px;margin-top:42.67px;align-items:start}
+.kit-left{display:flex;flex-direction:column;gap:40px}
+.wide-img{aspect-ratio:16/9}
+.kit-item{display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px}
+.kit-no{font-size:20px;font-weight:300;line-height:1.5;letter-spacing:0.06em}
+.kit-text{display:flex;flex-direction:column;gap:8px}
+.file-note{display:flex;flex-direction:column;gap:12px;padding:24px;background:#EFECE9}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;letter-spacing:0;background:#EFECE9;padding:2px 8px;word-break:break-all}
+.file-note code{background:#E8E4E1}
+
+.readout-head{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:48px;align-items:end;margin-top:42.67px}
+.reeds{width:300px;height:260px}
+.table-box{overflow-x:auto;margin-top:42.67px}
+.sm-table{min-width:560px}
+.lv{font-size:32px;font-weight:200;line-height:1;letter-spacing:0}
+.rules{margin-top:64px}
+.ledger-col{display:flex;flex-direction:column;gap:24px}
+.ledger-v{min-height:150px}
+.ledger-v.short{min-height:118px}
+
+.track{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:56px}
+.track-step{position:relative;display:flex;flex-direction:column;gap:14px;padding:32px 32px 0 0;border-top:1px solid #B3ADA7}
+.track-step::before{content:"";position:absolute;top:-7px;left:0;width:13px;height:13px;border-radius:50%;background:#AE9368}
+.moves{margin-top:80px;display:flex;flex-direction:column;gap:40px}
+.foot-ornament{display:block;width:min(620px,90%);height:170px;margin:64px auto 0;object-fit:cover;opacity:0.75}
+
+.bounds{margin-top:42.67px}
+.bounds-col{display:flex;flex-direction:column;gap:24px}
+
+.start{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:64px;margin-top:42.67px;align-items:start}
+.steps{list-style:none;padding:0;display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:56px minmax(0,1fr);gap:16px;padding:32px 0;border-top:1px solid #B3ADA7}
+.step:first-child{border-top:0;padding-top:0}
+.step:last-child{padding-bottom:0}
+.step-body{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.paths{display:flex;flex-direction:column;gap:10px;list-style:none;padding:0}
+.paths li{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.callout{padding:20px 24px;background:#EEE7DD}
+
+.why{display:grid;grid-template-columns:320px minmax(0,1fr);gap:72px;margin-top:42.67px;align-items:start}
+.strip{aspect-ratio:3/4}
+.self-note{display:flex;flex-direction:column;gap:14px;margin-top:40px;padding-top:32px;border-top:1px solid #B3ADA7}
+
+.closing{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:48px;align-items:center}
+.closing-copy{display:flex;flex-direction:column;align-items:flex-start;gap:28px}
+.closing-art{width:100%;aspect-ratio:4/3}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;padding:0 8px}
+.foot-links{display:flex;flex-wrap:wrap;gap:0 24px;list-style:none;padding:0}
+.foot-links a{display:inline-flex;align-items:center;min-height:44px}
+
+@media (max-width: 860px){
+:root{--frame-inset:12px;--frame-gap:4px;--frame-notch:8px;--card-padding:48px 26px}
+.page{padding:0 12px 40px;gap:24px}
+.display-xl{font-size:76px}.swell{font-size:90px}.display-lg{font-size:52px}.display-md{font-size:34px}
+.heading-1{font-size:28px}.heading-2{font-size:24px}.body-lg{font-size:18px}.body{font-size:17px}
+.num{font-size:30px}.stat-num{font-size:48px}
+.hero-top,.hero-band,.two-col,.kit,.readout-head,.start,.why,.closing{grid-template-columns:minmax(0,1fr);gap:36px}
+.hero-art{justify-self:stretch;max-width:none}
+.hero-cloud,.reeds{display:none}
+.track{grid-template-columns:minmax(0,1fr)}
+.track-step{border-top:0;border-left:1px solid #B3ADA7;padding:0 0 32px 28px}
+.track-step::before{top:4px;left:-7px}
+.page .sm-ledger{grid-auto-flow:row;row-gap:28px}
+.page .sm-ledger > *{padding-inline:0}
+.page .sm-ledger > * + *{border-left:0;border-top:1px solid #B3ADA7;padding-top:28px}
+.page .ledger-v{writing-mode:horizontal-tb;min-height:0}
+.why .strip-wrap{max-width:300px}
+.sheet-num .eyebrow{display:none}
+}
+
+/* Wash the illustration perimeter into the paper without blurring its subjects. */
+.hero-art,.closing-art{
+  height:auto;
+  object-fit:contain;
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 91%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 17%,#000 83%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 91%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 17%,#000 83%,transparent 100%);
+  mask-composite:intersect;
+}
+.hero-art{align-self:start}
+img{max-width:100%}
+@media(max-width:860px){
+  .hero-cluster{gap:20px}
+  .hero-cluster>.eyebrow{display:none}
+  .hero-left{gap:0}
+  .hero-name{gap:16px}
+  .hero-top{gap:24px}
+}
+
+/* landing.css */
+/* 首屏最大的字是产品那句话，不再是竖排品名。 */
+
+#top .hero-top {
+  align-items: center;
+}
+
+#top .hero-lead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  max-width: 38rem;
+}
+
+#top .hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+#top .hero-lead .display-md {
+  font-size: 58px;
+  line-height: 1.25;
+}
+
+#top .hero-art {
+  max-width: 520px;
+  justify-self: end;
+  align-self: center;
+}
+
+#top .hero-stats {
+  margin-top: 40px;
+}
+
+.name-story {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.name-mark {
+  font-size: 72px;
+  line-height: 1.15;
+}
+
+.name-mark .swell {
+  font-size: 1.18em;
+}
+
+#kit .kit-lead {
+  max-width: 42rem;
+  margin-top: 42.67px;
+}
+
+#kit .kit {
+  margin-top: 28px;
+}
+
+@media (max-width: 1100px) {
+  #top .hero-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #top .hero-art {
+    max-width: 560px;
+    width: 100%;
+    justify-self: center;
+  }
+}
+
+@media (max-width: 860px) {
+  #top .hero-lead .display-md {
+    font-size: 34px;
+    letter-spacing: 0.06em;
+  }
+
+  .name-story {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .name-mark {
+    writing-mode: horizontal-tb;
+    font-size: 56px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="topbar">
+<a class="brand" href="#top"><span class="sm-seal seal-label">张骞</span><span class="heading-4">张骞.skill</span></a>
+<nav aria-label="页面导航">
+<ul class="nav body-sm">
+<li><a href="#kit">验证包</a></li>
+<li><a href="#readout">读数</a></li>
+<li><a href="#round">一回合</a></li>
+<li><a href="#bounds">边界</a></li>
+<li><a href="#start">开始使用</a></li>
+<li><a href="https://github.com/ShaohuaDavidLee/zhangqian">GitHub</a></li>
+</ul>
+</nav>
+</header>
+
+<section class="sheet sm-block sm-frame" id="top" aria-label="张骞.skill">
+<div class="hero-top">
+<div class="hero-lead">
+<div class="hero-kicker">
+<span class="sm-seal seal-label">张骞</span>
+<p class="heading-3">找到你的前十个海外付费用户</p>
+</div>
+<p class="eyebrow sm-latin">Zhangqian · A skill for first paying users</p>
+<h1 class="display-md">让市场告诉你<br>谁愿意为你付钱</h1>
+<p class="body-lg">先看一页行动单，知道今天找谁、发什么。先跑一个小实验，看谁真的用、谁愿意付钱。</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="https://github.com/ShaohuaDavidLee/zhangqian/raw/refs/heads/main/zhangqian.skill">下载 zhangqian.skill</a>
+<a class="btn btn-ghost" href="https://github.com/ShaohuaDavidLee/zhangqian">在 GitHub 查看</a>
+</div>
+<p class="caption sm-muted">给已经上线、还没找到第一批付费用户的独立开发者。已有用户，也能从他们开始测。</p>
+</div>
+<img width="1448" height="1086" fetchpriority="high" decoding="async" class="sm-vignette hero-art" srcset="https://zhangqian.caojuege.com/assets/hero-480-e9946e4633.webp 480w, https://zhangqian.caojuege.com/assets/hero-960-de03d65d36.webp 960w, https://zhangqian.caojuege.com/assets/hero-1448-e4556adeb8.webp 1448w" sizes="(max-width: 860px) calc(100vw - 76px), 520px" src="https://zhangqian.caojuege.com/assets/hero-960-de03d65d36.webp" alt="淡彩：张骞持节走在前面，随从牵着马和骆驼跟在后面">
+</div>
+<div class="stats sm-ledger hero-stats">
+<div class="stat"><p class="stat-figure"><span class="stat-num">3</span><span class="stat-unit">个输入</span></p><p class="caption sm-muted">产品链接、现有流量、你猜的人群</p></div>
+<div class="stat"><p class="stat-figure"><span class="stat-num">1</span><span class="stat-unit">个主实验</span></p><p class="caption sm-muted">另备一到两个，按需启动</p></div>
+<div class="stat"><p class="stat-figure"><span class="stat-num">7</span><span class="stat-unit">天</span></p><p class="caption sm-muted">完整观察，不提前判负</p></div>
+<div class="stat"><p class="stat-figure"><span class="stat-num">20</span><span class="stat-unit">分钟</span></p><p class="caption sm-muted">此后每天维护</p></div>
+</div>
+</section>
+
+<section class="sheet sm-block sm-frame" id="why-not" aria-labelledby="h-why-not">
+<div class="sheet-head">
+<div class="sm-title"><span class="sm-seal seal-label">张骞</span><h2 class="heading-1" id="h-why-not">它不替市场回答</h2></div>
+<div class="sheet-num"><span class="num" aria-hidden="true">壹</span><p class="eyebrow sm-latin">Not a growth playbook</p></div>
+</div>
+<div class="two-col">
+<div class="prose">
+<p class="body-lg">发帖、打榜、做搜索、找博主——这些建议都在替你回答「谁会买」，而那群人从没被问过。</p>
+</div>
+<p class="heading-2 statement">张骞不写营销方案，只把「谁会买」变成一个两周内能被证伪的问题。</p>
+</div>
+</section>
+
+<section class="sheet sm-block sm-frame" id="kit" aria-labelledby="h-kit">
+<div class="sheet-head">
+<div class="sm-title"><span class="sm-seal seal-label">张骞</span><h2 class="heading-1" id="h-kit">先看一页，再动手</h2></div>
+<div class="sheet-num"><span class="num" aria-hidden="true">贰</span><p class="eyebrow sm-latin">The validation kit</p></div>
+</div>
+<p class="body-lg kit-lead">你先给三样东西：产品链接、现有用户或流量从哪来、你猜谁最需要它。流量可以写没有，人群可以写不知道。</p>
+<div class="kit">
+<div class="kit-left">
+<figure class="sm-plate"><img loading="lazy" decoding="async" class="sm-plate__img wide-img" srcset="https://zhangqian.caojuege.com/assets/boat-480-9c7f5a9656.webp 480w, https://zhangqian.caojuege.com/assets/boat-960-334d620376.webp 960w, https://zhangqian.caojuege.com/assets/boat-1440-71ba9a5fff.webp 1440w" sizes="(max-width: 860px) calc(100vw - 76px), 480px" src="https://zhangqian.caojuege.com/assets/boat-960-334d620376.webp" alt="淡彩水墨：芦苇丛里泊着一条小船"><figcaption class="caption">芦荡泊舟　静候回音</figcaption></figure>
+<div class="file-note">
+<p class="body-sm">每轮一个 Markdown 文件：</p>
+<p><code>InkDao-验证包-第2轮.md</code></p>
+<p class="body-sm">正文直接执行，备选与技术细节在附录。</p>
+</div>
+</div>
+<ol class="sm-list plain">
+<li><div class="kit-item"><span class="kit-no sm-marker">01</span><div class="kit-text"><h3 class="heading-3">一页行动单</h3><p class="body">这轮测什么、先找谁、今天做什么，先看这一页。</p></div></div></li>
+<li><div class="kit-item"><span class="kit-no sm-marker">02</span><div class="kit-text"><h3 class="heading-3">一个主实验</h3><p class="body">找谁、怎么找、发哪段话、记什么、下一步，照着做。</p></div></div></li>
+<li><div class="kit-item"><span class="kit-no sm-marker">03</span><div class="kit-text"><h3 class="heading-3">直接可发的文案</h3><p class="body">用目标市场的语言写好，填真实信息就能发。</p></div></div></li>
+<li><div class="kit-item"><span class="kit-no sm-marker">04</span><div class="kit-text"><h3 class="heading-3">排期、记录与判断</h3><p class="body">按完整窗口记录，看使用和付款，决定继续、补测或停下。</p></div></div></li>
+<li><div class="kit-item"><span class="kit-no sm-marker">05</span><div class="kit-text"><h3 class="heading-3">需要时再看附录</h3><p class="body">备选实验、每个实验自己的链接、怎样记下使用和付款，还有研究依据，都放在后面。</p></div></div></li>
+</ol>
+</div>
+</section>
+
+<section class="sheet sm-block sm-frame" id="readout" aria-labelledby="h-readout">
+<div class="sheet-head">
+<div class="sm-title"><span class="sm-seal seal-label">张骞</span><h2 class="heading-1" id="h-readout">什么读数算数</h2></div>
+<div class="sheet-num"><span class="num" aria-hidden="true">叁</span><p class="eyebrow sm-latin">Six levels of evidence</p></div>
+</div>
+<div class="readout-head">
+<p class="body-lg" style="max-width: 640px">只认已经发生、能核验的行为。后台里多数数字是 0 级。</p>
+<img loading="lazy" decoding="async" class="sm-vignette reeds" src="https://zhangqian.caojuege.com/assets/reeds-600-7c4a5cb501.webp" alt="" aria-hidden="true">
+</div>
+<div class="table-box">
+<table class="sm-table">
+<thead>
+<tr><th class="caption" scope="col">级</th><th class="heading-3" scope="col">名称</th><th class="heading-3" scope="col">算这一级的读数</th></tr>
+</thead>
+<tbody>
+<tr><td class="lv sm-muted">0</td><td class="body sm-muted">不算</td><td class="body sm-muted">曝光、浏览、点赞、点击，「看起来不错」</td></tr>
+<tr><td class="lv">1</td><td class="body">原话</td><td class="body">目标用户说出具体需求或场景</td></tr>
+<tr><td class="lv">2</td><td class="body">行动</td><td class="body">完成核心动作、主动问价、留下联系方式</td></tr>
+<tr><td class="lv">3</td><td class="body">留存</td><td class="body">隔周回来用、用尽免费额度、实际采用结果</td></tr>
+<tr><td class="lv sm-accent">4</td><td class="body sm-accent">付钱</td><td class="body sm-accent">首笔付款到账，含预售和定金</td></tr>
+<tr><td class="lv">5</td><td class="body">回头</td><td class="body">续费、复购，或带来新的付费用户</td></tr>
+</tbody>
+</table>
+</div>
+<div class="rules sm-ledger">
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v">免费封顶</h3><p class="body-sm">免费用得再好，最高算 3 级。</p></div>
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v">到账为准</h3><p class="body-sm">「下个月就买」只算 1 级。</p></div>
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v">转述降级</h3><p class="body-sm">「朋友公司需要」最高算 1 级。</p></div>
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v">只取最高</h3><p class="body-sm">取最高一条，不取平均；每轮目标再高一级。</p></div>
+</div>
+</section>
+
+<section class="sheet sm-block sm-frame" id="round" aria-labelledby="h-round">
+<div class="sheet-head">
+<div class="sm-title"><span class="sm-seal seal-label">张骞</span><h2 class="heading-1" id="h-round">先跑一轮，看读数</h2></div>
+<div class="sheet-num"><span class="num" aria-hidden="true">肆</span><p class="eyebrow sm-latin">Start small, read the results</p></div>
+</div>
+<ol class="track plain">
+<li class="track-step"><h3 class="heading-4">准备好再开</h3><p class="body-sm">页面打得开，链接能追踪到这次实验，有人开始用和有人付钱都记得到。</p></li>
+<li class="track-step"><h3 class="heading-4">先开主实验</h3><p class="body-sm">有用户先回访，按真实任务找下一批人。</p></li>
+<li class="track-step"><h3 class="heading-4">每天跟进</h3><p class="body-sm">日常维护二十分钟以内，记下使用和付款。</p></li>
+<li class="track-step"><h3 class="heading-4">到期再判断</h3><p class="body-sm">客户收到入口后观察满七天，再决定是否开备选。</p></li>
+</ol>
+<div class="moves">
+<p class="subheading">读数之后，四种走法</p>
+<div class="sm-ledger">
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v short">加注</h3><p class="body-sm">过线且有人付钱：再找一小批同任务用户复验。</p></div>
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v short">先收定金</h3><p class="body-sm">过线但没人付钱：先补预售或定金，收到钱再加注。</p></div>
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v short">查中断</h3><p class="body-sm">有访问、没开始用：先查在哪一步中断，再按证据处理。</p></div>
+<div class="ledger-col"><h3 class="heading-2 sm-tate sm-tate-start ledger-v short">停下</h3><p class="body-sm">样本足、流程正常仍连续两轮全败，回到需求层。</p></div>
+</div>
+<p class="caption sm-muted">没触达到足够的人，先补样本；未启动的备选不算失败。</p>
+</div>
+<img loading="lazy" decoding="async" class="foot-ornament" srcset="https://zhangqian.caojuege.com/assets/ornament-480-486547d14e.webp 480w, https://zhangqian.caojuege.com/assets/ornament-800-1af7bc9769.webp 800w, https://zhangqian.caojuege.com/assets/ornament-1240-efc60388f2.webp 1240w" sizes="(max-width: 860px) calc(90vw - 68px), 620px" src="https://zhangqian.caojuege.com/assets/ornament-800-1af7bc9769.webp" alt="" aria-hidden="true">
+</section>
+
+<section class="sheet sm-block sm-frame" id="bounds" aria-labelledby="h-bounds">
+<div class="sheet-head">
+<div class="sm-title"><span class="sm-seal seal-label">张骞</span><h2 class="heading-1" id="h-bounds">它做的事，不做的事</h2></div>
+<div class="sheet-num"><span class="num" aria-hidden="true">伍</span><p class="eyebrow sm-latin">Boundaries</p></div>
+</div>
+<div class="bounds sm-ledger">
+<div class="bounds-col">
+<h3 class="heading-3">它会做的</h3>
+<ul class="sm-list plain">
+<li><p class="body">按产品现状测，只修硬伤</p></li>
+<li><p class="body">结论都写成待验证的假设</p></li>
+<li><p class="body">预算默认接近零</p></li>
+</ul>
+</div>
+<div class="bounds-col">
+<h3 class="heading-3">它不会做的</h3>
+<ul class="sm-list plain">
+<li><p class="body">不改你的落地页、定位和功能</p></li>
+<li><p class="body">不投放、不刷量、不写假评论</p></li>
+<li><p class="body">不保证结果，判负也是答案</p></li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="sheet sm-block sm-frame" id="start" aria-labelledby="h-start">
+<div class="sheet-head">
+<div class="sm-title"><span class="sm-seal seal-label">张骞</span><h2 class="heading-1" id="h-start">三步开始</h2></div>
+<div class="sheet-num"><span class="num" aria-hidden="true">陆</span><p class="eyebrow sm-latin">Get started</p></div>
+</div>
+<div class="start">
+<ol class="steps">
+<li class="step"><span class="num" aria-hidden="true">一</span><div class="step-body"><h3 class="heading-3">安装技能包</h3><p class="body">下载后，导入支持 .skill 的工具。</p><a class="btn btn-primary" href="https://github.com/ShaohuaDavidLee/zhangqian/raw/refs/heads/main/zhangqian.skill">下载 zhangqian.skill</a></div></li>
+<li class="step"><span class="num" aria-hidden="true">二</span><div class="step-body"><h3 class="heading-3">或者手动安装</h3><p class="body">把 <a href="https://github.com/ShaohuaDavidLee/zhangqian/blob/main/SKILL.md">SKILL.md</a> 放进技能目录，重开会话。</p><ul class="paths"><li><span class="caption sm-muted">Claude Code</span><code>~/.claude/skills/zhangqian/SKILL.md</code></li><li><span class="caption sm-muted">Codex</span><code>~/.codex/skills/zhangqian/SKILL.md</code></li></ul></div></li>
+<li class="step"><span class="num" aria-hidden="true">三</span><div class="step-body"><h3 class="heading-3">说一句话</h3><p class="body">在 AI 工具里输入：</p><blockquote class="callout"><p class="body">用张骞帮我找第一批海外付费用户。产品链接是【你的产品链接】；目前的用户或流量来自【来源，也可以写没有】；我猜最需要它的人是【最多 3 类，也可以写不知道】。</p></blockquote><p class="caption sm-muted">AI 需要能读取你的产品网页。</p></div></li>
+</ol>
+<figure class="sm-plate"><img loading="lazy" decoding="async" class="sm-plate__img" style="aspect-ratio: 4/3" srcset="https://zhangqian.caojuege.com/assets/journey-480-9bdb448f66.webp 480w, https://zhangqian.caojuege.com/assets/journey-960-b4729a4202.webp 960w, https://zhangqian.caojuege.com/assets/journey-1448-32de220412.webp 1448w" sizes="(max-width: 860px) calc(100vw - 76px), 480px" src="https://zhangqian.caojuege.com/assets/journey-960-b4729a4202.webp" alt="淡彩水墨：关隘之外，一条小路伸进戈壁和沙丘，张骞一行正走出关去"><figcaption class="caption">出关西去　前路未凿</figcaption></figure>
+</div>
+</section>
+
+<section class="sheet sm-block sm-frame" id="name" aria-labelledby="h-name">
+<div class="sheet-head">
+<div class="sm-title"><span class="sm-seal seal-label">张骞</span><h2 class="heading-1" id="h-name">为什么叫张骞</h2></div>
+<div class="sheet-num"><span class="num" aria-hidden="true">柒</span><p class="eyebrow sm-latin">Why the name</p></div>
+</div>
+<div class="why">
+<div class="strip-wrap"><figure class="sm-plate"><img loading="lazy" decoding="async" class="sm-plate__img strip" srcset="https://zhangqian.caojuege.com/assets/envoy-320-4ebae705f8.webp 320w, https://zhangqian.caojuege.com/assets/envoy-640-c892847966.webp 640w, https://zhangqian.caojuege.com/assets/envoy-960-9922ab29b0.webp 960w" sizes="(max-width: 860px) 300px, 320px" src="https://zhangqian.caojuege.com/assets/envoy-960-9922ab29b0.webp" alt="淡彩水墨：张骞持旄节立于戈壁山脊，望向西域山川与前路"><figcaption class="caption">持节西行　凿空西域</figcaption></figure></div>
+<div class="name-story">
+<p class="display-lg sm-tate name-mark" aria-hidden="true">张<span class="swell">骞</span></p>
+<div>
+<div class="prose">
+<p class="body-lg">张骞第一次出使西域，一百多人出发，十三年后回来两个人，任务没有完成。</p>
+<p class="body">但他在大夏的市集上看见蜀布和竹杖，由此推断出一条新路。司马迁说他「凿空」。</p>
+<p class="body">第一轮大概率判负。它的用处，是让你知道第二次该带什么。</p>
+</div>
+<div class="self-note">
+<h3 class="heading-3">它自己的读数，还是空的</h3>
+<p class="body">包青天给它打了七十六分，第一条问题是「没有自家银票」。第一轮我会拿 InkDao 跑，记录表原样公开，判负也贴。</p>
+<p class="caption sm-muted">David　草诀歌 AI Labs</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="sheet sm-block sm-frame" id="end" aria-labelledby="h-end">
+<div class="closing">
+<div class="closing-copy">
+<span class="sm-seal seal-label">张骞</span>
+<h2 class="display-md" id="h-end">去试一次<br>看看市场怎么说</h2>
+<p class="body-lg">它可能说你错了——这正是它有价值的地方。</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="https://github.com/ShaohuaDavidLee/zhangqian/raw/refs/heads/main/zhangqian.skill">下载 zhangqian.skill</a>
+<a class="btn btn-ghost" href="https://github.com/ShaohuaDavidLee/zhangqian">在 GitHub 查看</a>
+</div>
+<p class="caption sm-muted">小赌先行　读数说话</p>
+</div>
+<figure style="display: flex; flex-direction: column; gap: 14px"><img loading="lazy" decoding="async" class="sm-vignette closing-art" srcset="https://zhangqian.caojuege.com/assets/market-480-7733fa9f40.webp 480w, https://zhangqian.caojuege.com/assets/market-960-52a7b176de.webp 960w, https://zhangqian.caojuege.com/assets/market-1448-96a40d54ae.webp 1448w" sizes="(max-width: 860px) calc(100vw - 76px), 520px" src="https://zhangqian.caojuege.com/assets/market-960-52a7b176de.webp" alt="淡彩水墨：大夏的市集上，张骞俯身看商人摊开的布匹，摊边立着一排竹杖"><figcaption class="caption sm-muted" style="text-align: center">大夏市上　得见蜀布</figcaption></figure>
+</div>
+</section>
+
+<footer class="foot">
+<p class="caption sm-muted">张骞.skill　草诀歌 AI Labs 出品</p>
+<ul class="foot-links caption">
+<li><a href="https://github.com/ShaohuaDavidLee/zhangqian">GitHub</a></li>
+<li><a href="https://caojuege.com">caojuege.com</a></li>
+</ul>
+</footer>
+
+</div>
+</body>
+</html>
