@@ -2,7 +2,7 @@
 
 #top .hero-left {
   justify-content: flex-start;
-  gap: 32px;
+  gap: 12px;
 }
 
 #top .hero-lead {
@@ -40,5 +40,41 @@
   #top .hero-lead .display-md {
     font-size: 34px;
     letter-spacing: 0.06em;
+  }
+}
+
+/* 竖排长句原来高出品名一截，把按钮挤出第一屏。桌面把这两列收得和品名一样高。 */
+@media (max-width: 1100px) and (min-width: 861px) {
+  #top .hero-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #top .hero-lead {
+    order: -1;
+  }
+
+  #top .hero-art {
+    width: 100%;
+    max-width: 560px;
+    justify-self: end;
+  }
+}
+
+@media (min-width: 861px) {
+  #top.sm-block {
+    padding-top: 56px;
+  }
+
+  #top .hero-cluster > .sm-tate {
+    max-height: 344px;
+  }
+
+  /* 英文竖排换行后要从左读到右，避免后半句跑到前半句左边。 */
+  #top .hero-cluster > .eyebrow {
+    writing-mode: vertical-lr;
+  }
+
+  #top .hero-lead {
+    gap: 12px;
   }
 }
