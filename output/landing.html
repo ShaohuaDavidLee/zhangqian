@@ -420,29 +420,55 @@ img{max-width:100%}
 }
 
 /* landing.css */
-/* 首屏只做一件事：把原页横条里的句子和按钮抬进第一眼能读到的位置。 */
+/* 首屏最大的字是产品那句话，不再是竖排品名。 */
 
-#top .hero-left {
-  justify-content: flex-start;
-  gap: 12px;
+#top .hero-top {
+  align-items: center;
 }
 
 #top .hero-lead {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 20px;
-  max-width: 34rem;
+  gap: 18px;
+  max-width: 38rem;
+}
+
+#top .hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 #top .hero-lead .display-md {
-  font-size: 48px;
-  line-height: 1.28;
+  font-size: 58px;
+  line-height: 1.25;
 }
 
 #top .hero-art {
-  max-width: 540px;
+  max-width: 520px;
+  justify-self: end;
   align-self: center;
+}
+
+#top .hero-stats {
+  margin-top: 40px;
+}
+
+.name-story {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.name-mark {
+  font-size: 72px;
+  line-height: 1.15;
+}
+
+.name-mark .swell {
+  font-size: 1.18em;
 }
 
 #kit .kit-lead {
@@ -454,50 +480,31 @@ img{max-width:100%}
   margin-top: 28px;
 }
 
-@media (max-width: 860px) {
-  #top .hero-lead {
-    order: -1;
-  }
-
-  #top .hero-lead .display-md {
-    font-size: 34px;
-    letter-spacing: 0.06em;
-  }
-}
-
-/* 竖排长句原来高出品名一截，把按钮挤出第一屏。桌面把这两列收得和品名一样高。 */
-@media (max-width: 1100px) and (min-width: 861px) {
+@media (max-width: 1100px) {
   #top .hero-top {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  #top .hero-lead {
-    order: -1;
-  }
-
   #top .hero-art {
-    width: 100%;
     max-width: 560px;
-    justify-self: end;
+    width: 100%;
+    justify-self: center;
   }
 }
 
-@media (min-width: 861px) {
-  #top.sm-block {
-    padding-top: 56px;
+@media (max-width: 860px) {
+  #top .hero-lead .display-md {
+    font-size: 34px;
+    letter-spacing: 0.06em;
   }
 
-  #top .hero-cluster > .sm-tate {
-    max-height: 344px;
+  .name-story {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  /* 英文竖排换行后要从左读到右，避免后半句跑到前半句左边。 */
-  #top .hero-cluster > .eyebrow {
-    writing-mode: vertical-lr;
-  }
-
-  #top .hero-lead {
-    gap: 12px;
+  .name-mark {
+    writing-mode: horizontal-tb;
+    font-size: 56px;
   }
 }
 </style>
@@ -521,16 +528,12 @@ img{max-width:100%}
 
 <section class="sheet sm-block sm-frame" id="top" aria-label="张骞.skill">
 <div class="hero-top">
-<div class="hero-left">
-<div class="hero-cluster">
-<p class="eyebrow sm-latin sm-tate">Zhangqian · A skill for first paying users</p>
-<p class="heading-3 sm-tate">找到你的前十个海外付费用户</p>
-<div class="hero-name">
-<p class="display-xl sm-tate">张<span class="swell">骞</span></p>
-<span class="sm-seal seal-label">张骞</span>
-</div>
-</div>
 <div class="hero-lead">
+<div class="hero-kicker">
+<span class="sm-seal seal-label">张骞</span>
+<p class="heading-3">找到你的前十个海外付费用户</p>
+</div>
+<p class="eyebrow sm-latin">Zhangqian · A skill for first paying users</p>
 <h1 class="display-md">让市场告诉你<br>谁愿意为你付钱</h1>
 <p class="body-lg">先看一页行动单，知道今天找谁、发什么。先跑一个小实验，看谁真的用、谁愿意付钱。</p>
 <div class="cta-row">
@@ -539,8 +542,13 @@ img{max-width:100%}
 </div>
 <p class="caption sm-muted">给已经上线、还没找到第一批付费用户的独立开发者。已有用户，也能从他们开始测。</p>
 </div>
+<img width="1448" height="1086" fetchpriority="high" decoding="async" class="sm-vignette hero-art" srcset="https://zhangqian.caojuege.com/assets/hero-480-e9946e4633.webp 480w, https://zhangqian.caojuege.com/assets/hero-960-de03d65d36.webp 960w, https://zhangqian.caojuege.com/assets/hero-1448-e4556adeb8.webp 1448w" sizes="(max-width: 860px) calc(100vw - 76px), 520px" src="https://zhangqian.caojuege.com/assets/hero-960-de03d65d36.webp" alt="淡彩：张骞持节走在前面，随从牵着马和骆驼跟在后面">
 </div>
-<img width="1448" height="1086" fetchpriority="high" decoding="async" class="sm-vignette hero-art" srcset="https://zhangqian.caojuege.com/assets/hero-480-e9946e4633.webp 480w, https://zhangqian.caojuege.com/assets/hero-960-de03d65d36.webp 960w, https://zhangqian.caojuege.com/assets/hero-1448-e4556adeb8.webp 1448w" sizes="(max-width: 860px) calc(100vw - 76px), 540px" src="https://zhangqian.caojuege.com/assets/hero-960-de03d65d36.webp" alt="淡彩：张骞持节走在前面，随从牵着马和骆驼跟在后面">
+<div class="stats sm-ledger hero-stats">
+<div class="stat"><p class="stat-figure"><span class="stat-num">3</span><span class="stat-unit">个输入</span></p><p class="caption sm-muted">产品链接、现有流量、你猜的人群</p></div>
+<div class="stat"><p class="stat-figure"><span class="stat-num">1</span><span class="stat-unit">个主实验</span></p><p class="caption sm-muted">另备一到两个，按需启动</p></div>
+<div class="stat"><p class="stat-figure"><span class="stat-num">7</span><span class="stat-unit">天</span></p><p class="caption sm-muted">完整观察，不提前判负</p></div>
+<div class="stat"><p class="stat-figure"><span class="stat-num">20</span><span class="stat-unit">分钟</span></p><p class="caption sm-muted">此后每天维护</p></div>
 </div>
 </section>
 
@@ -554,12 +562,6 @@ img{max-width:100%}
 <p class="body-lg">发帖、打榜、做搜索、找博主——这些建议都在替你回答「谁会买」，而那群人从没被问过。</p>
 </div>
 <p class="heading-2 statement">张骞不写营销方案，只把「谁会买」变成一个两周内能被证伪的问题。</p>
-</div>
-<div class="stats sm-ledger">
-<div class="stat"><p class="stat-figure"><span class="stat-num">3</span><span class="stat-unit">个输入</span></p><p class="caption sm-muted">产品链接、现有流量、你猜的人群</p></div>
-<div class="stat"><p class="stat-figure"><span class="stat-num">1</span><span class="stat-unit">个主实验</span></p><p class="caption sm-muted">另备一到两个，按需启动</p></div>
-<div class="stat"><p class="stat-figure"><span class="stat-num">7</span><span class="stat-unit">天</span></p><p class="caption sm-muted">完整观察，不提前判负</p></div>
-<div class="stat"><p class="stat-figure"><span class="stat-num">20</span><span class="stat-unit">分钟</span></p><p class="caption sm-muted">此后每天维护</p></div>
 </div>
 </section>
 
@@ -691,6 +693,8 @@ img{max-width:100%}
 </div>
 <div class="why">
 <div class="strip-wrap"><figure class="sm-plate"><img loading="lazy" decoding="async" class="sm-plate__img strip" srcset="https://zhangqian.caojuege.com/assets/envoy-320-4ebae705f8.webp 320w, https://zhangqian.caojuege.com/assets/envoy-640-c892847966.webp 640w, https://zhangqian.caojuege.com/assets/envoy-960-9922ab29b0.webp 960w" sizes="(max-width: 860px) 300px, 320px" src="https://zhangqian.caojuege.com/assets/envoy-960-9922ab29b0.webp" alt="淡彩水墨：张骞持旄节立于戈壁山脊，望向西域山川与前路"><figcaption class="caption">持节西行　凿空西域</figcaption></figure></div>
+<div class="name-story">
+<p class="display-lg sm-tate name-mark" aria-hidden="true">张<span class="swell">骞</span></p>
 <div>
 <div class="prose">
 <p class="body-lg">张骞第一次出使西域，一百多人出发，十三年后回来两个人，任务没有完成。</p>
@@ -701,6 +705,7 @@ img{max-width:100%}
 <h3 class="heading-3">它自己的读数，还是空的</h3>
 <p class="body">包青天给它打了七十六分，第一条问题是「没有自家银票」。第一轮我会拿 InkDao 跑，记录表原样公开，判负也贴。</p>
 <p class="caption sm-muted">David　草诀歌 AI Labs</p>
+</div>
 </div>
 </div>
 </div>
