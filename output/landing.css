@@ -1,0 +1,44 @@
+/* 首屏只做一件事：把原页横条里的句子和按钮抬进第一眼能读到的位置。 */
+
+#top .hero-left {
+  justify-content: flex-start;
+  gap: 32px;
+}
+
+#top .hero-lead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  max-width: 34rem;
+}
+
+#top .hero-lead .display-md {
+  font-size: 48px;
+  line-height: 1.28;
+}
+
+#top .hero-art {
+  max-width: 540px;
+  align-self: center;
+}
+
+#kit .kit-lead {
+  max-width: 42rem;
+  margin-top: 42.67px;
+}
+
+#kit .kit {
+  margin-top: 28px;
+}
+
+@media (max-width: 860px) {
+  #top .hero-lead {
+    order: -1;
+  }
+
+  #top .hero-lead .display-md {
+    font-size: 34px;
+    letter-spacing: 0.06em;
+  }
+}
